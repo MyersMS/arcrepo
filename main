@@ -1,0 +1,839 @@
+################################################################################################
+################################################################################################
+# 1. Determine the properties of the input feature class using DESCRIBE
+# 2. Get the syntax of arcpy functions and tools using USAGE
+# 3. Give a shp a projection using another shp's .prj file:
+# 4. Return a lists in the workspace
+# 5. Return rows in a column
+# 6. Insert a row with a value under a specified column
+# 7. Insert 5 row with the same value under a specified column
+# 8. Update a list of values in a row
+# 9. Update a list of values in a row using DELIMITER
+# 10. Add a column to a shp and update the rows based off another column
+# 11. Delete a list of values in a row
+# 12. Search for row(s) with numerical column using SQL
+# 13. Search for row(s) with numerical column using SQL
+# 14. Search for row(s) with delimiter field using SQL
+# 15. Edit a text file
+# 16. Return the property of a raster - MULTI band
+# 17. Finding the resolution of MULTIband rasters
+# 18. Return the property of a raster - SINGLE band
+# 19. List the data frames in the Austin TX mxd
+# 20. Update the coordinate system of the layers in the dataframe using
+#     the coordinate system of one of the layers.
+# 21. Get the file path of the map document currently open in ArcMap
+# 22. Get the list of the data frames in the current map document and view the properties
+# 23. Return the list of all the layers in the map document
+# 24. Access layers in a specific dataframe
+# 25. Find a layers with a particular name
+# 26. Print the names of the layers in a map document that have broken data sources
+# 27. Replace all the workspace paths in the current map document
+# 28. Replace the worskpace path and workspace type
+# 29. Using Variables for Multiple Tool Calls
+# 30. Get a a file's basename
+# 31. Extract the directory path from the full path file name
+# 32. Create a full pathfile name from the two parts
+# 33. Remove extension using slicing
+# 34. List the files in the current directory
+# 35. Using a hard-coded where-clause
+# 36. Loop through the files in the directory
+# 37. Using a while loop on a geoprocessing and uniquely renaming the result files
+# 38. Buffer each feature class in the workspace and place output in a different workspace
+# 39. List all the rasters in a workspace whose name contains a specified substring and list the field names for each raster
+# 40. Use enumerate to get both the index and the value of each item as you loop through a list
+# 41. Copy files to another workspace and change all the fields rows to upper case
+# 42. In a txt file, find the sum of the values in the rows
+# 43.
+# 44.
+# 45.
+# 46.
+# 47.
+# 48.
+# 49.
+# 50.
+# 51.
+# 52.
+# 53.
+# 54.
+# 55.
+# 56.
+# 57.
+# 58.
+# 59.
+# 60.
+################################################################################################
+################################################################################################
+
+#######################################################################
+# Chapter 5
+#######################################################################
+##########
+# 1.
+# Determine the properties of the input feature class using DESCRIBE
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise05"
+
+x = arcpy.Describe("F:/Python_Scripting/Exercise06/counties.shp")
+
+print "Name of feature class WITHOUT extention: ", x.baseName
+print
+print "Name of feature class WITH extention: ", x.name
+print
+print "Type of element: ", x.dataType
+print
+print "Type of feature class: ", x.shapeType
+print
+print "Catalogue path: ", x.catalogPath
+print
+print "File path: ", x.file
+
+##########
+# 2.
+# Get the syntax of arcpy functions and tools using USAGE
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise05"
+
+x = arcpy.Usage("Exists")
+y = arcpy.Usage("Clip_analysis")
+print x
+print
+print y
+
+##########
+# 3.
+# Give a shp a projection using another shp's .prj file
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise05"
+
+prjFile = "F:/Python_Scripting/Exercise06/cities.prj"
+spatial_ref = arcpy.SpatialReference(prjFile)
+arcpy.DefineProjection_management("cities_test", spatial_ref)
+print spatial_ref.name
+
+#######################################################################
+# Chapter 6
+#######################################################################
+##########
+# 4.
+# Return a lists in the workspace
+##########
+
+# ListFeatureClasses ( {wild_card}, {feature_type}, {feature_dataset} )
+# ListRasters ( {wild_card}, {raster_type} )
+# ListFields( dataset, {wild_card}, {field_type} )
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise06"
+
+fclist = arcpy.ListFeatureClasses()
+for fc in fclist:
+    fcdescribe = arcpy.Describe(fc)
+    print "Name: ", fcdescribe.name
+    print "Type: ", fcdescribe.dataType
+
+fclist = arcpy.ListFields("cities.shp")
+print "The fields in cities.shp are:"
+for field in fclist:
+    print "Name: ", field.name
+    print "Type: ", field.dataType
+    print "Type: ", field.length
+
+#######################################################################
+# Chapter 7
+#######################################################################
+##########
+# 5.
+# Return rows in a column
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "F:/Python_Scripting/Exercise07/airports.shp"
+cursor = arcpy.da.SearchCursor(fc, ["County"])
+for row in cursor:
+    print "Airport location = ", row
+
+del row # Removes the exclusive lock created in the script
+del cursor
+
+##########
+# 6.
+# Insert a row with a value under a specified column
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "F:/Python_Scripting/1/cities.shp"
+cursor = arcpy.da.InsertCursor(fc, ["NAME"]) # "NAME" is the column to be updated"
+cursor.insertRow(["DELETE"]) # "DELETE" is the row under column NAME to be inserted"
+
+del row # Removes the exclusive lock created in the script
+del cursor
+
+##########
+# 7.
+# Insert 5 row with the same value under a specified column
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "F:/Python_Scripting/1/cities.shp"
+cursor = arcpy.da.InsertCursor( fc, ["NAME"]  # "NAME" is the column to be updated"
+x = 1
+while x <= 5:
+    cursor.insertRow( ["DELETE_AGAIN"] )# "DELETE" is the row under column NAME to be inserted"
+    x += 1
+
+del row # Removes the exclusive lock created in the script
+del cursor
+
+##########
+# 8.
+# Update a list of values in a row
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "F:/Python_Scripting/1/cities.shp"
+cursor = arcpy.da.UpdateCursor( fc, ["NAME"] )
+for row in cursor:
+    if row[0] == "DELETE": # 0 stands for the Name column
+        cursor.updateRow(["updateDelete"])
+
+del row
+del cursor
+
+##########
+# 9.
+# Update a list of values in a row using DELIMITER
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "Results/airports.shp"
+delimitedField = arcpy.AddFieldDelimiters(fc, "STATE")
+# For columns with alphabets only
+# Use delimited field to avoid complications from varying formats of the feature classes
+cursor = arcpy.da.UpdateCursor(fc, ["STATE"], delimitedField + " <> 'AK'")
+for row in cursor:
+    row[0] = "AK"
+    cursor.updateRow(row)
+
+del row
+del cursor
+
+##########
+# 10.
+# Add a column to a shp and update the rows based off another column
+##########
+
+import arcpy
+from arcpy import env
+env.workspace = "F:/Python_Scripting/Exercise07/Results"
+
+fc = "roads.shp"
+arcpy.AddField_management(fc, fieldname, fieldtype, "", "", 12)
+cursor = arcpy.da.UpdateCursor( fc, ["FERRY", "FEATURE"] )
+for row in cursor:
+    if row[1] == "Other Highway":
+        row [0] = "YES"
+    else:
+        row[0] = "NO"
+    cursor.updateRow(row)
+
+##########
+# 11.
+# Delete a list of values in a row
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "F:/Python_Scripting/1/cities.shp"
+cursor = arcpy.da.UpdateCursor( fc, ["NAME"] )
+for row in cursor:
+    if row[0] == "DELETE_AGAIN": # 0 stands for the Name column
+        cursor.deleteRow()
+
+del row
+del cursor
+
+##########
+# 12.
+# Search for row(s) with numerical column using SQL
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise07"
+
+import arcpy
+from arcpy import env
+env.workspace = "F:/Python_Scripting/Exercise07"
+fc = "airports.shp"
+cursor = arcpy.da.SearchCursor(fc, ["NAME"], '"TOT_ENP" > 100000') # For numerical columns
+for row in cursor:
+    print row[0]
+
+del row
+del cursor
+
+##########
+# 13.
+# Search for row(s) with numerical column using SQL
+##########
+
+import arcpy
+arcpy.workspace = "F:/Python_Scripting/Exercise07"
+
+fc = "airports.shp"
+# For columns with alphabets only
+# Use the escape character below to allow for the quotation marks for the string
+cursor = arcpy.da.SearchCursor(fc, ["NAME"], '"Feature" = \'Seaplane Base\'')
+for row in cursor:
+    print row[0]
+
+del row
+del cursor
+
+##########
+# 14.
+# Search for row(s) with delimiter field using SQL
+##########
+
+import arcpy
+from arcpy import env
+env.workspace = "F:/Python_Scripting/Exercise07"
+fc = "airports.shp"
+delimitedField = arcpy.AddFieldDelimiters(fc, "COUNTY")
+# For columns with alphabets only
+# Use delimited field to avoid complications from varying formats of the feature classes
+cursor = arcpy.da.SearchCursor(fc, ["NAME"], delimitedField + " = 'Anchorage Borough'")
+for row in cursor:
+    print row[0]
+
+del row
+del cursor
+
+##########
+# 15.
+# Edit a text file
+##########
+
+input =  open ("F:/Python_Scripting/coord.txt")
+output = open ("F:/Python_Scripting/new_coord.txt", "w")
+for line in input:
+    str = line.replace("ID:", "")
+    str = str.replace(",	Lat:", "")
+    str = str.replace(",	Long:", "")
+    output.write(str)
+input.close()
+output.close()
+
+##########
+# 16.
+# Return the property of a raster - MULTI band
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python_Scripting/Exercise09"
+raster = "tm.img"
+desc = arcpy.Describe(raster)
+# Properties vary depending on the type of raster data element
+print "General MULTIband raster properties: "
+print "Raster base name: " + desc.basename
+print "Raster data type: ", desc.dataType
+print "Raster file extension: " + desc.extension
+
+print "Specific raster properties: "
+print "Raster spatial reference: " + desc.spatialReference.name
+print "The raster format ", desc.format
+print "Compression type: " + desc.compressionType
+print "Number of bands: ", str(desc.bandCount)
+print
+print "Others: "
+print
+spatialref = desc.spatialReference
+print spatialref.name
+print spatialref.linearUnitName
+
+##########
+# 17.
+# Finding the resolution of MULTIband rasters
+##########
+
+import arcpy
+from arcpy import env
+env.workspace = "F:/Python_Scripting/Exercise09"
+raster = "tm.img/Layer_1"
+desc = arcpy.Describe(raster)
+x = desc.meanCellHeight
+y = desc.meanCellWidth
+spatialref = desc.spatialReference
+units = spatialref.linearUnitName
+print "The raster resolution is " + str(x) + " by " + str(y) + " " + units + "."
+
+##########
+# 18.
+# Return the property of a raster - SINGLE band
+##########
+
+import arcpy
+from arcpy import env
+env.workspace = "F:/Python_Scripting/Exercise09"
+raster = "landcover.tif"
+desc = arcpy.Describe(raster)
+x = desc.meanCellHeight
+y = desc.meanCellWidth
+spatialref = desc.spatialReference
+units = spatialref.linearUnitName
+print "The raster resolution is " + str(x) + " by " + str(y) + " " + units + "."
+
+##########
+# 19.
+# List the data frames in the Austin TX mxd
+##########
+
+import arcpy
+mxd = "F:/Python_Scripting/Exercise10/Austin_TX.mxd"
+mapdoc = arcpy.mapping.MapDocument(mxd)
+listdf = arcpy.mapping.ListDataFrames(mapdoc)
+for df in listdf:
+    print df.name
+del mapdoc
+del listdf
+
+##########
+# 20.
+#### Update the coordinate system of the layers in the dataframe using
+#### the coordinate system of one of the layers.
+##########
+
+import arcpy
+mxd = "F:/Python_Scripting/Exercise10/Austin_TX.mxd"
+mapdoc = arcpy.mapping.MapDocument(mxd)
+dataset = "F:/Python_Scripting/Exercise10/Austin/base.shp"
+spatialref = arcpy.Describe(dataset).spatialReference
+extent = arcpy.Describe(dataset).extent
+for df in arcpy.mapping.ListDataFrames(mapdoc):
+    df.spatialReference = spatialref
+    df.panToExtent(extent)
+    df.scale = 15000
+mapdoc.save()
+del mapdoc
+
+##########
+# 21.
+# Get the file path of the map document currently open in ArcMap
+##########
+
+import arcpy
+mapdoc = arcpy.mapping.MapDocument("CURRENT")
+path = mapdoc.filepath
+print path
+del mapdoc
+
+##########
+# 22.
+# Get the list of the data frames in the current map document and view the properties
+##########
+
+import  arcpy
+mapdoc = arcpy.mapping.MapDocument("CURRENT")
+listdf = arcpy.mapping.ListDataFrames(mapdoc)
+for df in listdf:
+    print df.name
+    #### print listdf[0].name - To work with just one of the data frames
+del mapdoc
+
+##########
+# 23.
+# Return the list of all the layers in the map document
+##########
+
+import arcpy
+myDoc = arcpy.mapping.MapDocument("CURRENT") # Change to mapdoc instead of myDoc?
+lyrlist = arcpy.mapping.ListLayers(mapdoc)
+for lyr in lyrlist:
+    print lyr.name
+
+##########
+# 24.
+# Access layers in a specific dataframe
+##########
+
+import arcpy
+myDoc = arcpy.mapping.MapDocument("CURRENT") # Change to mapdoc instead of myDoc?
+dflist = arcpy.mapping.ListDataFrames(mapdoc)
+lyrlist = arcpy.mapping.ListLayers(mapdoc, "", dflist[0])
+for lyr in lyrlist:
+    print lyr.name
+
+##########
+# 25.
+# Find a layers with a particular name
+##########
+
+import arcpy
+myDoc = arcpy.mapping.MapDocument("CURRENT") # Change to mapdoc instead of myDoc?
+lyrlist = arcpy.mapping.ListLayers(mapdoc)
+for lyr in lyrlist:
+    if lyr.name == "hospitals":
+        lyr.showLabels = True
+del lyrlist
+
+##########
+# 26.
+# Print the names of the layers in a map document that have broken data sources
+##########
+
+import arcpy
+myDoc = arcpy.mapping.MapDocument("CURRENT") # Change to mapdoc instead of myDoc?
+brokenlist = arcpy.mapping.ListBrokenDataSources(mapdoc)
+lyrlist = arcpy.mapping.ListLayers(mapdoc, "", dflist[0])
+for lyr in lyrlist:
+        print lyr.name
+        ## Use lyr.dataSource to see the current data source being referenced by the layer
+del mapdoc
+
+##########
+# 27.
+# Replace all the workspace paths in the current map document
+##########
+
+import arcpy
+mapdoc = arcpy.mapping.MapDocument("CURRENT")
+mapdoc.findAndReplaceWorkspacePaths("old_path", "new_path")
+mapdoc.save()
+del mapdoc
+
+##########
+# 28.
+# Replace the worskpacepath and workspace type
+##########
+
+import arcpy
+mapdoc = arcpy.mapping.MapDocument("CURRENT")
+mapdoc.replaceWorkspaces("","","","")
+mapdoc.save()
+del mapdoc
+
+##########
+# 29.
+# Using Variables for Multiple Tool Calls
+##########
+
+import arcpy
+
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = 'F:/Python for ArcGIS/Sample_data/ch06/'
+outDir = 'F:/Python for ArcGIS/Results/'
+
+# Set buffer params
+fireDamage = 'special_regions.shp'
+fireBuffer = outDir + fireDamage[:-4] + 'Buffer.shp'
+bufferDist = '1 mile'
+
+# Set clip params
+park = 'park.shp'
+clipOutput = outDir + park[:-4] + 'DamageBuffer.shp'
+
+arcpy.Buffer_analysis(fireDamage, fireBuffer, bufferDist)
+print '{0} created.'.format(fireBuffer)
+arcpy.Clip_analysis(park, fireBuffer, clipOutput)
+print '{0} created.'.format(clipOutput)
+
+##########
+# 30.
+# Get a a file's basename
+##########
+
+import os
+
+infile = "F:/Python for ArcGIS/Sample_Data/ch07/park.shp"
+filename = os.path.basename(infile)
+print filename
+
+##########
+# 31.
+# Extract the directory path from the full path file name
+##########
+
+import os
+
+infile = "F:/Python for ArcGIS/Sample_Data/ch07/park.shp"
+filepath = os.path.dirname(infile)
+print filepath
+
+##########
+# 32.
+# Create a full pathfile name from the two parts
+##########
+
+import os
+
+infile = "F:/Python for ArcGIS/Sample_Data/ch07/park.shp"
+filepath = os.path.join(filepath, filename)
+print filepath
+
+##########
+# 33.
+# Remove extension using slicing
+##########
+
+myShapefile = 'parks.shp'
+rootName = myShapefile[:-4]
+print rootName
+
+##########
+# 34.
+# List the files in the current directory
+##########
+
+import os
+
+scriptPath = os.path.abspath(__file__)
+scriptDir = os.path.dirname(scriptPath)
+
+print '{0} cpmtaoms the following files: '.format(scriptDir)
+print os.listdir(scriptDir)
+
+##########
+# 35.
+# Using a hard-coded where-clause
+##########
+
+import arcpy
+
+arcpy.env.workspace = "F:/Python for ArcGIS/Sample_Data/ch09"
+inputFile = "park.shp"
+whereClause = "RECNO >= 400"
+arcpy.Select_analysis(inputFile, "F:/Python for ArcGIS/Results/park_recno400.shp", whereClause)
+
+##########
+# 36.
+# Loop through the files in the directory
+##########
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+
+arcpy.env.workspace = "F:/Python for ArcGIS/Sample_Data/ch02/fires.shp"
+
+theDir = "F:/Python for ArcGIS/Sample_Data/ch10/pics/"
+theFiles = os.listdir(theDir)
+
+for fileName in theFiles:
+    print fileName
+
+##########
+# 37.
+# Using a while loop on a geoprocessing and uniquely renaming the result files
+##########
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+
+arcpy.env.workspace = "F:/Python for ArcGIS/Results/"
+# outDir = "F:/Python for ArcGIS/Results/dist"
+
+fire = "F:/Python for ArcGIS/Sample_Data/ch10/county.gdb/fireStations"
+schools = "F:/Python for ArcGIS/Sample_Data/ch10/county.gdb/schools"
+radius = [500, 1000, 1500, 2000, 2500]
+radius_count = 0
+
+while radius_count != 5:
+    for rad in radius:
+        outName = 'dist{0}.shp'.format(rad)
+        arcpy.PointDistance_analysis(fire, schools, outName)
+        radius_count += 1
+        print "{0} created.".format(outName)
+
+##########
+# 38.
+# Buffer each feature class in the workspace and
+# place output in a different workspace
+##########
+
+import arcpy
+arcpy.env.workspace = "F:/Python for ArcGIS/Sample_Data/ch11/"
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+# SET workspaces
+arcpy.env.workspace = 'F:/Python for ArcGIS/Sample_Data/ch11/'
+outDir = 'F:/Python for ArcGIS/Results/'
+if not os.path.exists(outDir):
+    os.mkdir(outDir)
+# GET a list of feature classes
+fcs = arcpy.ListFeatureClasses()
+for fc in fcs:
+    # SET the output variable
+    outName = os.path.splitext(fc)[0] + '_buffer.shp'
+    fcBuffer = os.path.join(outDir, outName)
+    # Call buffer tool
+    arcpy.Buffer_analysis(fc, fcBuffer, '1 mile')
+    print '{0} created in {1}.'.format(fcBuffer, outDir)
+
+##########
+# 39.
+# List all the rasters in a workspace whose name contains
+# a specified substring and list the field names for each raster
+##########
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = 'F:/Python for ArcGIS/Sample_Data/ch11/rastTester.gdb'
+inDir = 'F:/Python for ArcGIS/Sample_Data/ch11/rastTester.gdb'
+outDir = 'F:/Python for ArcGIS/Results/'
+
+rast = arcpy.ListRasters("*COVER*")
+
+for rasters in rast:
+    print rasters
+    fields = arcpy.ListFields(rasters)
+    for field in fields:
+        print "\t {0}".format(field.name)
+
+##########
+# 40.
+# Use enumerate to get both the index and the value of each item as you loop through a list
+##########
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = 'F:/Python for ArcGIS/Sample_Data/ch12'
+
+fc = arcpy.ListFeatureClasses()
+
+for features, x in enumerate(fc):
+    print features, x
+
+##########
+# 41.
+# Copy files to another workspace and change all the fields rows to upper case
+##########
+
+import arcpy, os
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = 'F:/Python for ArcGIS/Sample_Data/ch17'
+
+inFc = 'F:/Python for ArcGIS/Sample_Data/ch17/park.shp'
+copyFc = 'F:/Python for ArcGIS/Results/park.shp'
+
+arcpy.CopyFeatures_management(inFc, copyFc)
+
+desc = arcpy.Describe(copyFc)
+fields = desc.fields
+
+for field in fields:
+    if field.Type == "String":
+        cursor = arcpy.da.UpdateCursor(copyFc, str(field.name))
+        for row in cursor:
+            if row[0] == None:
+                continue
+            else:
+                any(x.islower() for x in row[0]) == True
+                row[0] = row[0].title()
+                cursor.updateRow(row)
+
+##########
+# 42.
+# In a txt file, find the sum of the values in the rows
+##########
+
+# In a txt file, find the sum of the values in the rows
+
+infile = 'F:/Python for ArcGIS/Sample_Data/ch19/report.txt'
+try:
+    with open(infile, 'r') as f:
+        for line in f:
+
+            # String to list of strings.
+            lineList = line.split()
+
+            # String items to float items.
+            nums = [float(i) for i in lineList]
+
+            # First col is ID, rest are data values.
+            ID = nums[0]
+            data = nums[1:]
+
+            # Count and sum the values and report the results.
+            count = len(data)
+            total = sum(data)
+
+            print 'ID: {0}   Sum: {1}   Count {2}'.format(ID, total, count)
+            print 'Data: {0}'.format(data)
+
+except IOError:
+    print "{0} doesn't exist or can't be opened.".format(infile)
+
+##########
+# 43.
+#
+##########
+##########
+# 44.
+#
+##########
+##########
+# 45.
+#
+##########
+
+##########
+# 46.
+#
+##########
+##########
+# 47.
+#
+##########
+
+##########
+# 48.
+#
+##########
+##########
+# 49.
+#
+##########
+##########
+# 50.
+#
+##########
+
+##########
+# 11.
+#
+##########
+##########
+# 11.
+#
+##########
+##########
+# 11.
+#
+##########
+
+
+
+
+
+
+
+
+
+
+
